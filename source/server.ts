@@ -1,7 +1,7 @@
 import http from 'http';
 import express, {Express} from 'express';
-// import morgan from 'morgan';
-// import routes from './routes/posts';
+import {RepositoriesFinder} from "./gitHubRepositories/repositoriesFinder.js";
+import {GitHubOwnerStatistic} from "./gitHubRepositories/gitHubOwnerStatistic.js";
 
 const router: Express = express();
 
@@ -28,11 +28,16 @@ router.use((req, res, next) => {
 /** Routes */
 // router.use('/', routes);
 
-router.get('/', (req, res) => res.send({
-    asd: 'das',
-    age: 43,
-    isTrue: false
-}));
+router.get('/', async (req, res) => {
+
+    const repositoriesFinder = new RepositoriesFinder();
+
+    const repos = await repositoriesFinder.getRepos("github");
+
+    const statistic = new GitHubOwnerStatistic(repos);
+
+    res.send(statistic)
+});
 
 /** Error handling */
 router.use((req, res, next) => {
